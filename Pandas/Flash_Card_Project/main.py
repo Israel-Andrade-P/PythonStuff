@@ -4,20 +4,21 @@ from random import choice
 
 BACKGROUND_COLOR = "#B1DDC6"
 current_card = {}
-
+to_learn = {}
 
 # -------------- GET WORD --------------------------------#
 try:
     data = pd.read_csv("./data/words_to_learn.csv")
 except FileNotFoundError:
-    data = pd.read_csv("./data/jp_vocab.csv")    
-finally:
-    jp_words = data.to_dict(orient="records")
+    original_data = pd.read_csv("./data/jp_vocab.csv")
+    to_learn = original_data.to_dict(orient="records")    
+else:
+    to_learn = data.to_dict(orient="records")
 
 def next_card():
     global current_card, flip_timer
     window.after_cancel(flip_timer)
-    current_card = choice(jp_words)
+    current_card = choice(to_learn)
     canvas.itemconfig(language_text, text="Japanese", fill="black")
     canvas.itemconfig(word_text, text=current_card["Japanese"], fill="black")
     canvas.itemconfig(canvas_img, image=front_img)
@@ -32,8 +33,8 @@ def flip_card():
 
 
 def is_known():
-    jp_words.remove(current_card)
-    data = pd.DataFrame(jp_words)
+    to_learn.remove(current_card)
+    data = pd.DataFrame(to_learn)
     data.to_csv("./data/words_to_learn.csv")
     next_card()
 
